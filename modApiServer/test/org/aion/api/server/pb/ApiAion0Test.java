@@ -920,14 +920,9 @@ public class ApiAion0Test {
     @Test
     public void testProcessIsSyncing() throws Exception {
         rsp = sendRequest(Message.Servs.s_net_VALUE, Message.Funcs.f_isSyncing_VALUE);
-
         assertEquals(Message.Retcode.r_success_VALUE, rsp[1]);
 
-        Message.rsp_isSyncing rslt = Message.rsp_isSyncing.parseFrom(stripHeader(rsp));
-        assertNotEquals(AionImpl.inst().isSyncComplete(), rslt.getSyncing());
-
         rsp = sendRequest(Message.Servs.s_hb_VALUE, Message.Funcs.f_isSyncing_VALUE);
-
         assertEquals(Message.Retcode.r_fail_service_call_VALUE, rsp[1]);
     }
 
@@ -941,7 +936,6 @@ public class ApiAion0Test {
         assertEquals(Message.Retcode.r_success_VALUE, rsp[1]);
 
         Message.rsp_syncInfo rslt = Message.rsp_syncInfo.parseFrom(stripHeader(rsp));
-        assertNotEquals(impl.isSyncComplete(), rslt.getSyncing());
         assertEquals(
                 (long) impl.getLocalBestBlockNumber().orElse(0L), (long) rslt.getChainBestBlock());
         assertEquals(

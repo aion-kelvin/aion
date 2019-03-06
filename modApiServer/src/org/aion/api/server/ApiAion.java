@@ -218,12 +218,33 @@ public abstract class ApiAion extends Api {
         }
     }
 
+    /**
+     * Returns a {@link SyncInfo} indicating the current status of the sync.
+     *
+     * <p>In the case that the network best block is zero, the current status is interpreted to be
+     * that the node is still trying to connect to its peers, and therefore is still trying to sync.
+     * This interpretation simplifies the vast majority of use cases, but a standalone node with no
+     * peers will think it is always trying to sync.
+     *
+     * <p>Otherwise, since a node never really stops syncing, syncing is considered finished once
+     * the local node gets sufficiently close to the network best. This method considers
+     * "sufficiently close" to mean within 5 blocks of the network best.
+     *
+     * @return the current status of the sync.
+     */
     protected SyncInfo getSync() {
         SyncInfo sync = new SyncInfo();
-        sync.done = this.ac.isSyncComplete();
+
         sync.chainStartingBlkNumber = this.ac.getInitialStartingBlockNumber().orElse(0L);
         sync.networkBestBlkNumber = this.ac.getNetworkBestBlockNumber().orElse(0L);
         sync.chainBestBlkNumber = this.ac.getLocalBestBlockNumber().orElse(0L);
+
+        if (sync.networkBestBlkNumber == 0) {
+            sync.done = false;
+        } else {
+            sync.done = (sync.chainBestBlkNumber + 5 >= sync.networkBestBlkNumber);
+        }
+
         return sync;
     }
 

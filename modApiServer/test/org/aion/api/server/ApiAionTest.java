@@ -210,7 +210,6 @@ public class ApiAionTest {
     public void testGetSync() {
         SyncInfo sync = api.getSync();
         assertNotNull(sync);
-        assertEquals(sync.done, impl.isSyncComplete());
         if (impl.getInitialStartingBlockNumber().isPresent())
             assertEquals(
                     (long) impl.getInitialStartingBlockNumber().get(), sync.chainStartingBlkNumber);
